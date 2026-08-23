@@ -59,7 +59,7 @@ Otox/
 
 ---
 
-## 🏁 Instalación & Ejecución Local (Local Deployment)
+## 🏁 Instalación & Ejecución Local (Local Deployment).
 
 Si querés clonar este proyecto y probarlo en tu propia máquina (Linux, Windows, MacOS o Android Termux), seguí estos pasos:
 
