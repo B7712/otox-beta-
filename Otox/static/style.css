@@ -1,0 +1,655 @@
+/* ==========================================================================
+   OTOX - RED SOCIAL MUSICAL (FASE 2: ESTILOS CSS3)
+   Estética: Cyberpunk / Oscuro Neón & Modo Claro Dinámico
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. VARIABLES GLOBALES (MODO OSCURO - DEFAULT)
+   -------------------------------------------------------------------------- */
+:root {
+    /* Fondos */
+    --bg-main: #0f0f13;
+    --bg-card: #181820;
+    --bg-card-hover: #21212b;
+    --bg-input: #121218;
+    
+    /* Neones y Acentos Cyberpunk */
+    --neon-purple: #9d4edd;
+    --neon-purple-glow: rgba(157, 78, 221, 0.4);
+    --neon-cyan: #00f5d4;
+    --neon-cyan-glow: rgba(0, 245, 212, 0.3);
+    --neon-pink: #f72585;
+    
+    /* Tipografía y Textos */
+    --text-primary: #f8f9fa;
+    --text-secondary: #a0a0b0;
+    --text-muted: #6c757d;
+    --font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    
+    /* Detalles Visuales */
+    --border-color: #2a2a36;
+    --border-glow: 0 0 10px var(--neon-purple-glow);
+    --radius-sm: 8px;
+    --radius-md: 14px;
+    --radius-lg: 20px;
+    --transition: all 0.25s ease-in-out;
+}
+
+/* --------------------------------------------------------------------------
+   2. TEMA CLARO (CYBERPUNK LIGHT THEME)
+   -------------------------------------------------------------------------- */
+[data-theme="light"], body.light-theme {
+    --bg-main: #eef1f6;
+    --bg-card: #ffffff;
+    --bg-card-hover: #f4f6f9;
+    --bg-input: #e2e6ea;
+    
+    --neon-purple: #7b2cbf;
+    --neon-purple-glow: rgba(123, 44, 191, 0.25);
+    --neon-cyan: #0096c7;
+    --neon-cyan-glow: rgba(0, 150, 199, 0.25);
+    --neon-pink: #d90429;
+    
+    --text-primary: #121316;
+    --text-secondary: #4a4d55;
+    --text-muted: #71757e;
+    
+    --border-color: #d1d5db;
+    --border-glow: 0 0 10px rgba(123, 44, 191, 0.2);
+}
+
+/* Reset Global */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: var(--font-family);
+}
+
+body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Scrollbar Personalizado */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: var(--bg-main);
+}
+::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: var(--radius-sm);
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--neon-purple);
+}
+
+/* --------------------------------------------------------------------------
+   3. LAYOUT PRINCIPAL (3 COLUMNAS RESPONSIVE)
+   -------------------------------------------------------------------------- */
+.app-container {
+    display: grid;
+    grid-template-columns: 260px 1fr 340px;
+    max-width: 1440px;
+    margin: 0 auto;
+    min-height: 100vh;
+    gap: 20px;
+    padding: 0 15px;
+}
+
+/* --------------------------------------------------------------------------
+   4. SIDEBAR (Navegación Izquierda)
+   -------------------------------------------------------------------------- */
+.sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 25px 15px;
+    border-right: 1px solid var(--border-color);
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 20px;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo-img {
+    height: 38px;
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 0 6px var(--neon-cyan));
+    transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.logo-img:hover {
+    transform: scale(1.08);
+    filter: drop-shadow(0 0 12px var(--neon-purple));
+}
+
+.logo-text {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    background: linear-gradient(45deg, var(--neon-cyan), var(--neon-purple));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.nav-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px 18px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    transition: var(--transition);
+}
+
+.nav-link i {
+    font-size: 1.2rem;
+}
+
+.nav-link:hover {
+    color: var(--text-primary);
+    background-color: var(--bg-card);
+    transform: translateX(5px);
+}
+
+.nav-link.active {
+    color: var(--text-primary);
+    background: linear-gradient(90deg, rgba(157, 78, 221, 0.2), transparent);
+    border-left: 4px solid var(--neon-purple);
+    box-shadow: var(--border-glow);
+}
+
+.user-card-mini {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    margin-top: auto;
+}
+
+.avatar-placeholder, .avatar-small {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--neon-purple), var(--neon-pink));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.85rem;
+    color: #fff;
+    box-shadow: 0 0 10px rgba(247, 37, 133, 0.3);
+}
+
+.user-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-name {
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.user-handle {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+/* --------------------------------------------------------------------------
+   5. MAIN CONTENT (Feed y Secciones)
+   -------------------------------------------------------------------------- */
+.main-content {
+    padding: 25px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.top-header h2 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 10px;
+}
+
+/* Formulario Crear Publicación */
+.create-post-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.create-post-card h3 {
+    font-size: 1rem;
+    margin-bottom: 15px;
+    color: var(--neon-cyan);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#post-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+input[type="text"], input[type="url"], select {
+    width: 100%;
+    padding: 12px 16px;
+    background-color: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    outline: none;
+    transition: var(--transition);
+}
+
+input:focus, select:focus {
+    border-color: var(--neon-purple);
+    box-shadow: 0 0 8px var(--neon-purple-glow);
+}
+
+.btn-primary {
+    align-self: flex-end;
+    padding: 10px 24px;
+    background: linear-gradient(135deg, var(--neon-purple), #7b2cbf);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: 0 0 10px var(--neon-purple-glow);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 18px var(--neon-purple-glow);
+}
+
+/* Tarjetas de Publicación (Feed) */
+.feed-section {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.post-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    transition: var(--transition);
+}
+
+.post-card:hover {
+    border-color: rgba(157, 78, 221, 0.5);
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.3);
+}
+
+.post-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.post-time {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.post-caption {
+    margin-bottom: 15px;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+.media-frame {
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    margin-bottom: 15px;
+    background-color: #000;
+}
+
+.media-frame iframe {
+    display: block;
+    border: none;
+}
+
+.post-actions {
+    display: flex;
+    gap: 15px;
+    border-top: 1px solid var(--border-color);
+    padding-top: 12px;
+}
+
+.post-actions button {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: var(--transition);
+}
+
+.post-actions button:hover {
+    color: var(--neon-pink);
+}
+
+/* Bloques de Bóveda y Ajustes */
+.section-block {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+}
+
+.section-block h2 {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    color: var(--neon-cyan);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.settings-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.settings-form label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+/* --------------------------------------------------------------------------
+   6. WIDGETS PANEL (Estudios Otox - Columna Derecha)
+   -------------------------------------------------------------------------- */
+.widgets-panel {
+    padding: 25px 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+.widget-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.widget-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.widget-header h3 {
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-small {
+    padding: 6px 12px;
+    background-color: transparent;
+    border: 1px solid var(--neon-cyan);
+    color: var(--neon-cyan);
+    border-radius: var(--radius-sm);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.btn-small:hover {
+    background-color: var(--neon-cyan);
+    color: #000;
+    box-shadow: 0 0 10px var(--neon-cyan-glow);
+}
+
+.search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-box i {
+    position: absolute;
+    left: 14px;
+    color: var(--text-muted);
+}
+
+.search-box input {
+    padding-left: 40px;
+}
+
+.widget-card h4 {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.studies-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.study-item {
+    padding: 12px;
+    background-color: var(--bg-main);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.study-item:hover {
+    border-color: var(--neon-purple);
+    transform: translateY(-2px);
+}
+
+.study-item.active {
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 10px var(--neon-cyan-glow);
+}
+
+.study-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.study-info strong {
+    font-size: 0.85rem;
+    color: var(--text-primary);
+}
+
+.study-info small {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.badge {
+    font-size: 0.65rem;
+    padding: 4px 8px;
+    border-radius: 20px;
+    background-color: rgba(157, 78, 221, 0.15);
+    color: var(--neon-purple);
+    border: 1px solid var(--neon-purple);
+    font-weight: 700;
+}
+
+/* Capítulos del Estudio */
+.chapter-view {
+    border-top: 1px solid var(--border-color);
+    padding-top: 15px;
+}
+
+.chapter-view h4 {
+    margin-bottom: 12px;
+}
+
+.chapters-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.chapters-list li {
+    font-size: 0.85rem;
+    padding: 10px 12px;
+    background-color: var(--bg-main);
+    border-radius: var(--radius-sm);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--text-secondary);
+}
+
+.chapters-list li i.fa-check {
+    color: var(--neon-cyan);
+}
+
+.chapters-list li i.fa-play {
+    color: var(--neon-pink);
+    font-size: 0.75rem;
+}
+
+/* --------------------------------------------------------------------------
+   7. RESPONSIVE DESIGN (FIX PARA CELULARES Y TABLETS)
+   -------------------------------------------------------------------------- */
+@media (max-width: 1024px) {
+    .app-container {
+        grid-template-columns: 80px 1fr 300px;
+    }
+    
+    .logo-text, .nav-link span, .user-details {
+        display: none;
+    }
+    
+    .sidebar {
+        align-items: center;
+    }
+    
+    .nav-link {
+        justify-content: center;
+        padding: 12px;
+    }
+}
+
+@media (max-width: 768px) {
+    .app-container {
+        grid-template-columns: 1fr;
+        padding: 0 10px;
+    }
+
+    /* FIX: Convertimos la Sidebar en Header Top en Celular para MOSTRAR EL LOGO Y NOMBRE */
+    .sidebar {
+        position: relative;
+        height: auto;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding: 15px 10px;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .brand {
+        padding-bottom: 0;
+    }
+
+    /* Forzamos visibilidad de logo y título en celular */
+    .logo-container {
+        display: flex !important;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .logo-img {
+        height: 32px !important;
+    }
+
+    .logo-text {
+        display: inline-block !important;
+        font-size: 1.2rem !important;
+    }
+
+    .nav-menu {
+        flex-direction: row;
+        gap: 5px;
+        margin-top: 0;
+    }
+
+    .nav-link {
+        padding: 8px;
+    }
+
+    .nav-link span {
+        display: none; /* Iconos solamente en la nav bar rápida */
+    }
+
+    .user-card-mini, .widgets-panel {
+        display: none; /* Escondemos widgets pesados en mobile para limpiar espacio */
+    }
+}

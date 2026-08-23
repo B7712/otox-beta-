@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="es" {% if perfil and perfil.tema == 'claro' %}data-theme="light"{% endif %}>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Otox - Red Social Musical</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    {% if not perfil and tab_activa not in ['politicas', 'terminos'] %}
+    <!-- VISTA DE AUTENTICACIÓN (LOGIN / REGISTRO) SI NO HAY SESIÓN -->
+    <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--bg-main, #0b0c10); padding: 20px;">
+        <div style="background: var(--bg-card, #1f2833); border: 1px solid var(--neon-cyan, #00f5d4); border-radius: 12px; padding: 30px; width: 100%; max-width: 420px; box-shadow: 0 0 15px rgba(0, 245, 212, 0.2);">
+            <div style="text-align: center; margin-bottom: 25px;">
+                <img src="{{ url_for('static', filename='images/Otox.jpeg') }}" alt="Otox Logo" style="width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 2px solid var(--neon-cyan, #00f5d4);">
+                <h2 style="color: #fff; margin-top: 10px;">Otox <small style="font-size: 0.8rem; color: var(--neon-cyan, #00f5d4);">(Beta)</small></h2>
+                <p style="color: var(--text-muted, #c5c6c7); font-size: 0.9rem;">Red Social Musical</p>
+            </div>
+
+            {% with messages = get_flashed_messages() %}
+              {% if messages %}
+                <div style="background: rgba(255, 74, 74, 0.2); border: 1px solid #ff4a4a; color: #ff4a4a; padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 0.85rem; text-align: center;">
+                  {% for message in messages %}
+                    <p style="margin: 0;">{{ message }}</p>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            {% endwith %}
+
+            <!-- BOTONES TABS LOGIN / REGISTRO -->
+            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <button type="button" id="btn-tab-login" onclick="mostrarAuthForm('login')" class="btn-primary" style="flex: 1; padding: 8px;">Iniciar Sesión</button>
+                <button type="button" id="btn-tab-register" onclick="mostrarAuthForm('register')" class="btn-small" style="flex: 1; padding: 8px; text-align: center; border: 1px solid var(--border-color, #45a29e);">Registrarse</button>
+            </div>
+
+            <!-- FORMULARIO LOGIN -->
+            <form id="form-login" action="{{ url_for('auth') }}" method="POST" style="display: flex; flex-direction: column; gap: 12px;">
+                <input type="hidden" name="accion" value="login">
+                <div>
+                    <label style="color: #fff; font-size: 0.85rem;">Correo Electrónico:</label>
+                    <input type="email" name="email" placeholder="tu@email.com" required style="width: 100%; padding: 10px; margin-top: 4px; background: var(--bg-input, #0b0c10); color: #fff; border: 1px solid var(--border-color, #45a29e); border-radius: 6px;">
+                </div>
+                <div>
+                    <label style="color: #fff; font-size: 0.85rem;">Contraseña:</label>
+                    <input type="password" name="password" placeholder="••••••••••••" required style="width: 100%; padding: 10px; margin-top: 4px; background: var(--bg-input, #0b0c10); color: #fff; border: 1px solid var(--border-color, #45a29e); border-radius: 6px;">
+                </div>
+                <button type="submit" class="btn-primary" style="padding: 12px; margin-top: 5px; width: 100%;">Entrar a Otox</button>
+            </form>
+
+            <!-- FORMULARIO REGISTRO -->
+            <form id="form-register" action="{{ url_for('auth') }}" method="POST" style="display: none; flex-direction: column; gap: 12px;">
+                <input type="hidden" name="accion" value="register">
+                <div>
+                    <label style="color: #fff; font-size: 0.85rem;">Nombre / Alias Público:</label>
+                    <input type="text" name="nombre" placeholder="Ej. DevMúsica" required style="width: 100%; padding: 10px; margin-top: 4px; background: var(--bg-input, #0b0c10); color: #fff; border: 1px solid var(--border-color, #45a29e); border-radius: 6px;">
+                </div>
+                <div>
+                    <label style="color: #fff; font-size: 0.85rem;">Handle (@):</label>
+                    <input type="text" name="handle" placeholder="ej. devmusica" required style="width: 100%; padding: 10px; margin-top: 4px; background: var(--bg-input, #0b0c10); color: #fff; border: 1px solid var(--border-color, #45a29e); border-radius: 6px;">
+                </div>
+                <div>
+                    <label style="color: #fff; font-size: 0.85rem;">Correo Electrónico:</label>
+                    <input type="email" name="email" placeholder="tu@email.com" required style="width: 100%; padding: 10px; margin-top: 4px; background: var(--bg-input, #0b0c10); color: #fff; border: 1px solid var(--border-color, #45a29e); border-radius: 6px;">
+                </div>
+                <div>
+                    <label style="color: #fff; font-size: 0.85rem;">Contraseña:</label>
+                    <input type="password" name="password" placeholder="••••••••••••" required style="width: 100%; padding: 10px; margin-top: 4px; background: var(--bg-input, #0b0c10); color: #fff; border: 1px solid var(--border-color, #45a29e); border-radius: 6px;">
+                </div>
+                <button type="submit" class="btn-primary" style="padding: 12px; margin-top: 5px; width: 100%;">Crear Cuenta</button>
+            </form>
+
+            <!-- ENLACES DE POLÍTICAS Y TÉRMINOS EN LA PARTE INFERIOR -->
+            <hr style="border-color: var(--border-color, #45a29e); margin: 20px 0 15px 0;">
+            <div style="display: flex; justify-content: center; gap: 15px; font-size: 0.8rem;">
+                <a href="{{ url_for('politicas') }}" style="color: var(--neon-cyan, #00f5d4); text-decoration: none;">
+                    <i class="fa-solid fa-shield-halved"></i> Políticas de Privacidad
+                </a>
+                <span style="color: var(--text-muted, #c5c6c7);">|</span>
+                <a href="{{ url_for('terminos') }}" style="color: var(--neon-cyan, #00f5d4); text-decoration: none;">
+                    <i class="fa-solid fa-file-contract"></i> Términos de Uso
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function mostrarAuthForm(tipo) {
+            const formLogin = document.getElementById('form-login');
+            const formRegister = document.getElementById('form-register');
+            const btnLogin = document.getElementById('btn-tab-login');
+            const btnRegister = document.getElementById('btn-tab-register');
+
+            if (tipo === 'login') {
+                formLogin.style.display = 'flex';
+                formRegister.style.display = 'none';
+                btnLogin.className = 'btn-primary';
+                btnRegister.className = 'btn-small';
+                btnRegister.style.border = '1px solid var(--border-color, #45a29e)';
+            } else {
+                formLogin.style.display = 'none';
+                formRegister.style.display = 'flex';
+                btnRegister.className = 'btn-primary';
+                btnLogin.className = 'btn-small';
+                btnLogin.style.border = '1px solid var(--border-color, #45a29e)';
+            }
+        }
+    </script>
+    {% else %}
+
+    <div class="app-container">
+
+        <!-- BARRA LATERAL -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="logo-container">
+                    <img src="{{ url_for('static', filename='images/Otox.jpeg') }}" alt="Otox Logo" class="logo-img">
+                    <span class="logo-text">Otox (Beta)</span>
+                </div>
+            </div>
+
+            <nav class="nav-menu">
+                <a href="{{ url_for('home', tab='feed') }}" class="nav-link {{ 'active' if tab_activa == 'feed' else '' }}">
+                    <i class="fa-solid fa-house"></i> <span>Feed</span>
+                </a>
+                <a href="{{ url_for('home', tab='estudios') }}" class="nav-link {{ 'active' if tab_activa == 'estudios' else '' }}">
+                    <i class="fa-solid fa-book-open"></i> <span>Estudios</span>
+                </a>
+                <a href="{{ url_for('home', tab='boveda') }}" class="nav-link {{ 'active' if tab_activa == 'boveda' else '' }}">
+                    <i class="fa-solid fa-vault"></i> <span>Perfil</span>
+                </a>
+                <a href="{{ url_for('home', tab='ajustes') }}" class="nav-link {{ 'active' if tab_activa == 'ajustes' else '' }}">
+                    <i class="fa-solid fa-gear"></i> <span>Ajustes</span>
+                </a>
+            </nav>
+
+            <div class="user-card-mini">
+                <div class="avatar-placeholder">
+                    {% if perfil and perfil.foto_avatar %}
+                        <img src="{{ perfil.foto_avatar }}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
+                    {% else %}
+                        DEV
+                    {% endif %}
+                </div>
+                <div class="user-details">
+                    <span class="user-name">{{ perfil.nombre if perfil else 'Invitado' }}</span>
+                    <span class="user-handle">@{{ perfil.handle if perfil else 'invitado' }}</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <main class="main-content">
+            
+            <header class="top-header">
+                <h2>
+                    {% if tab_activa == 'feed' %}Feed Principal
+                    {% elif tab_activa == 'estudios' %}Estudios Otox
+                    {% elif tab_activa == 'boveda' %}Perfil / Bóveda
+                    {% elif tab_activa == 'ajustes' %}Configuración de la Cuenta
+                    {% elif tab_activa == 'detalle_post' %}Detalle de la Publicación
+                    {% elif tab_activa == 'detalle_estudio' %}Vista de Lección
+                    {% elif tab_activa == 'perfil_visitado' %}Perfil de Usuario
+                    {% elif tab_activa == 'politicas' %}Políticas de Privacidad
+                    {% elif tab_activa == 'terminos' %}Términos y Condiciones
+                    {% endif %}
+                </h2>
+            </header>
+
+            <!-- 1. FEED -->
+            {% if tab_activa == 'feed' %}
+            <div id="tab-feed" class="tab-content active-tab">
+                
+                <!-- BUSCADOR EN FEED -->
+                <form action="{{ url_for('home') }}" method="GET" style="display: flex; gap: 8px; margin-bottom: 15px;">
+                    <input type="hidden" name="tab" value="feed">
+                    <input type="text" name="q_feed" value="{{ q_feed }}" placeholder="🔍 Buscar posts en Feed..." style="flex: 1; padding: 10px; background: var(--bg-input); color: #fff; border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
+                    <button type="submit" class="btn-primary" style="padding: 10px 15px;">Buscar</button>
+                    {% if q_feed %}
+                    <a href="{{ url_for('home', tab='feed') }}" class="btn-small" style="text-decoration: none; display: flex; align-items: center; border: 1px solid #ff4a4a; color: #ff4a4a;">Limpiar</a>
+                    {% endif %}
+                </form>
+
+                <button id="toggle-post-btn" onclick="togglePostForm()" class="btn-primary" style="width: 100%; padding: 15px; font-size: 1.1rem; margin-bottom: 20px;">
+                    <i class="fa-solid fa-plus-circle"></i> Añadir Post
+                </button>
+
+                <section id="create-post-card" class="create-post-card" style="display: none; margin-bottom: 20px;">
+                    <h3><i class="fa-solid fa-pen-to-square"></i> Crear Nueva Publicación</h3>
+                    <form action="{{ url_for('crear_post') }}" method="POST">
+                        <input type="text" name="post-title" placeholder="Título de la publicación..." required>
+                        <input type="url" name="post-url" placeholder="Link de YouTube o Spotify..." required style="margin-top: 10px;">
+                        <textarea name="post-desc" placeholder="Añade una descripción..." rows="3" style="width: 100%; margin-top: 10px; background: var(--bg-input); color: #fff; border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 10px;" required></textarea>
+                        <div style="display: flex; gap: 10px; margin-top: 10px;">
+                            <button type="submit" class="btn-primary" style="flex: 1;">Publicar Post</button>
+                            <button type="button" class="btn-small" onclick="togglePostForm()" style="background: transparent; border: 1px solid #ff4a4a; color: #ff4a4a;">Cancelar</button>
+                        </div>
+                    </form>
+                </section>
+
+                {% if q_feed %}
+                <div style="background: rgba(0,245,212,0.1); border: 1px solid var(--neon-cyan); padding: 10px; border-radius: 8px; margin-bottom: 15px;">
+                    <i class="fa-solid fa-magnifying-glass"></i> Resultados de búsqueda para: <strong>"{{ q_feed }}"</strong>
+                </div>
+                {% endif %}
+
+                <section class="feed-section">
+                    {% for post in posts %}
+                    <article class="post-card" style="margin-bottom: 20px; background: var(--bg-card); padding: 15px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                        <div class="post-header" style="display: flex; gap: 10px; align-items: center;">
+                            <a href="{{ url_for('ver_perfil_usuario', handle=post.handle) }}" style="text-decoration: none; color: inherit; display: flex; gap: 10px; align-items: center;">
+                                <div class="avatar-small" style="width: 35px; height: 35px; border-radius: 50%; background: var(--neon-cyan); color: #000; font-weight: bold; display: flex; align-items: center; justify-content: center;">DV</div>
+                                <div>
+                                    <strong>{{ post.autor }}</strong> <small style="color: var(--text-muted);">@{{ post.handle }}</small>
+                                    <span class="post-time">• {{ post.tiempo }}</span>
+                                </div>
+                            </a>
+                        </div>
+                        <h4 style="margin: 10px 0 5px 0; color: var(--neon-cyan);">
+                            <a href="{{ url_for('ver_post', post_id=post.id) }}" style="color: inherit; text-decoration: none;">{{ post.titulo }}</a>
+                        </h4>
+                        <p class="post-caption">{{ post.descripcion }}</p>
+                        
+                        {% if post.media_url %}
+                        <div class="media-frame" style="margin-top: 10px;">
+                            <iframe width="100%" height="220" src="{{ post.media_url }}" frameborder="0" allowfullscreen></iframe>
+                        </div>
+                        {% endif %}
+
+                        <div class="post-actions" style="margin-top: 12px; display: flex; gap: 15px; align-items: center;">
+                            <form action="{{ url_for('like_post', post_id=post.id, redirect_to='feed') }}" method="POST" style="display:inline;">
+                                <button type="submit" class="btn-small" style="background: transparent; border: 1px solid var(--border-color);">
+                                    <i class="{{ 'fa-solid' if post.liked_by_me else 'fa-regular' }} fa-heart" style="{{ 'color: #ff4a4a;' if post.liked_by_me }}"></i> {{ post.likes }}
+                                </button>
+                            </form>
+                            <a href="{{ url_for('ver_post', post_id=post.id) }}" class="btn-small" style="text-decoration: none; display: inline-flex; align-items: center; gap: 5px; border: 1px solid var(--border-color);">
+                                <i class="fa-regular fa-comment"></i> {{ post.comentarios|length }} Comentarios
+                            </a>
+                        </div>
+                    </article>
+                    {% else %}
+                    <p style="color: var(--text-muted);">No se encontraron publicaciones que coincidan con la búsqueda.</p>
+                    {% endfor %}
+                </section>
+            </div>
+            {% endif %}
+
+            <!-- 2. DETALLE DE POST -->
+            {% if tab_activa == 'detalle_post' and post_detalle %}
+            <div id="tab-detalle-post" class="tab-content active-tab">
+                <a href="{{ url_for('home', tab='feed') }}" class="btn-small" style="margin-bottom: 15px; display: inline-block;"><i class="fa-solid fa-arrow-left"></i> Volver al Feed</a>
+                
+                <article class="post-card" style="background: var(--bg-card); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--neon-cyan);">
+                    <div class="post-header">
+                        <a href="{{ url_for('ver_perfil_usuario', handle=post_detalle.handle) }}" style="text-decoration: none; color: inherit; display: flex; gap: 10px; align-items: center;">
+                            <div class="avatar-small" style="width: 40px; height: 40px; border-radius: 50%; background: var(--neon-cyan); color: #000; font-weight: bold; display: flex; align-items: center; justify-content: center;">DV</div>
+                            <div>
+                                <strong>{{ post_detalle.autor }}</strong> <small style="color: var(--text-muted);">@{{ post_detalle.handle }}</small>
+                                <span class="post-time">• {{ post_detalle.tiempo }}</span>
+                            </div>
+                        </a>
+                    </div>
+                    <h3 style="margin: 15px 0 10px 0; color: var(--neon-cyan);">{{ post_detalle.titulo }}</h3>
+                    <p style="font-size: 1.05rem; line-height: 1.5;">{{ post_detalle.descripcion }}</p>
+                    
+                    {% if post_detalle.media_url %}
+                    <div class="media-frame" style="margin-top: 15px;">
+                        <iframe width="100%" height="350" src="{{ post_detalle.media_url }}" frameborder="0" allowfullscreen></iframe>
+                    </div>
+                    {% endif %}
+
+                    <div style="margin-top: 15px; display: flex; gap: 15px;">
+                        <form action="{{ url_for('like_post', post_id=post_detalle.id, redirect_to='detalle') }}" method="POST">
+                            <button type="submit" class="btn-small">
+                                <i class="{{ 'fa-solid' if post_detalle.liked_by_me else 'fa-regular' }} fa-heart" style="{{ 'color: #ff4a4a;' if post_detalle.liked_by_me }}"></i> {{ post_detalle.likes }} Me gusta
+                            </button>
+                        </form>
+                    </div>
+
+                    <div style="margin-top: 25px; border-top: 1px solid var(--border-color); padding-top: 15px;">
+                        <h4>Comentarios ({{ post_detalle.comentarios|length }})</h4>
+                        
+                        <form action="{{ url_for('comentar_post', post_id=post_detalle.id, redirect_to='detalle') }}" method="POST" style="display: flex; gap: 10px; margin: 15px 0;">
+                            <input type="text" name="comentario" placeholder="Escribe un comentario público..." required style="flex: 1; padding: 10px; background: var(--bg-input); border: 1px solid var(--border-color); color: #fff;">
+                            <button type="submit" class="btn-primary">Comentar</button>
+                        </form>
+
+                        {% for c in post_detalle.comentarios %}
+                        <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; margin-bottom: 12px; border-left: 3px solid var(--neon-purple);">
+                            <div style="display: flex; justify-content: space-between;">
+                                <a href="{{ url_for('ver_perfil_usuario', handle=c.handle) }}" style="color: inherit; text-decoration: none;">
+                                    <strong>{{ c.autor }}</strong> <small style="color: var(--text-muted);">@{{ c.handle }} • {{ c.fecha }}</small>
+                                </a>
+                                <form action="{{ url_for('like_comentario_post', post_id=post_detalle.id, comentario_id=c.id, redirect_to='detalle') }}" method="POST">
+                                    <button type="submit" style="background: transparent; border: none; color: #fff; cursor: pointer;">
+                                        <i class="{{ 'fa-solid' if c.liked_by_me else 'fa-regular' }} fa-heart" style="{{ 'color: #ff4a4a;' if c.liked_by_me }}"></i> {{ c.likes }}
+                                    </button>
+                                </form>
+                            </div>
+                            <p style="margin: 8px 0;">{{ c.texto }}</p>
+
+                            <div style="margin-left: 20px; border-left: 2px solid var(--border-color); padding-left: 10px; margin-top: 8px;">
+                                {% for r in c.respuestas %}
+                                <div style="font-size: 0.85rem; margin-top: 5px;">
+                                    <!-- PERFIL DEL QUE RESPONDIÓ EL COMENTARIO -->
+                                    <a href="{{ url_for('ver_perfil_usuario', handle=r.handle) }}" style="color: var(--neon-cyan); text-decoration: none; font-weight: bold;">{{ r.autor }} (@{{ r.handle }}):</a> 
+                                    <span>{{ r.texto }}</span> 
+                                    <small style="color: var(--text-muted);">({{ r.fecha }})</small>
+                                </div>
+                                {% endfor %}
+
+                                <form action="{{ url_for('responder_comentario_post', post_id=post_detalle.id, comentario_id=c.id, redirect_to='detalle') }}" method="POST" style="display: flex; gap: 5px; margin-top: 8px;">
+                                    <input type="text" name="respuesta" placeholder="Responder..." required style="flex: 1; padding: 5px; font-size: 0.8rem; background: var(--bg-input); border: 1px solid var(--border-color); color: #fff;">
+                                    <button type="submit" class="btn-small" style="padding: 4px 8px; font-size: 0.8rem;">Responder</button>
+                                </form>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </article>
+            </div>
+            {% endif %}
+
+            <!-- 3. ESTUDIOS CON BUSCADOR -->
+            {% if tab_activa == 'estudios' %}
+            <div id="tab-estudios" class="tab-content active-tab">
+                
+                <!-- BUSCADOR EN ESTUDIOS -->
+                <form action="{{ url_for('home') }}" method="GET" style="display: flex; gap: 8px; margin-bottom: 15px;">
+                    <input type="hidden" name="tab" value="estudios">
+                    <input type="text" name="q_estudios" value="{{ q_estudios }}" placeholder="🔍 Buscar lecciones, temas o categorías..." style="flex: 1; padding: 10px; background: var(--bg-input); color: #fff; border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
+                    <button type="submit" class="btn-primary" style="padding: 10px 15px;">Buscar</button>
+                    {% if q_estudios %}
+                    <a href="{{ url_for('home', tab='estudios') }}" class="btn-small" style="text-decoration: none; display: flex; align-items: center; border: 1px solid #ff4a4a; color: #ff4a4a;">Limpiar</a>
+                    {% endif %}
+                </form>
+
+                <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                    <a href="{{ url_for('home', tab='estudios', subtab='comunidad') }}" class="btn-small {{ 'btn-primary' if subtab_estudios == 'comunidad' else '' }}" style="text-decoration: none;">Comunidad</a>
+                    <a href="{{ url_for('home', tab='estudios', subtab='favoritos') }}" class="btn-small {{ 'btn-primary' if subtab_estudios == 'favoritos' else '' }}" style="text-decoration: none;">Favoritos / Guardados</a>
+                    <a href="{{ url_for('home', tab='estudios', subtab='mis_estudios') }}" class="btn-small {{ 'btn-primary' if subtab_estudios == 'mis_estudios' else '' }}" style="text-decoration: none;">Mis Estudios</a>
+                    {% if q_estudios %}
+                    <span class="btn-small btn-primary" style="background: var(--neon-purple);">Resultados de Búsqueda</span>
+                    {% endif %}
+                </div>
+
+                {% if subtab_estudios == 'mis_estudios' %}
+                <div style="background: var(--bg-card); padding: 15px; border: 1px solid var(--neon-cyan); border-radius: var(--radius-md); margin-bottom: 20px;">
+                    <h3><i class="fa-solid fa-plus-circle"></i> Crear Nuevo Estudio</h3>
+                    <form action="{{ url_for('crear_estudio') }}" method="POST" style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+                        <input type="text" name="estudio-titulo" placeholder="Título del estudio..." required style="padding: 8px;">
+                        <select name="estudio-categoria" style="padding: 8px;">
+                            <option value="Pentagrama">Pentagrama</option>
+                            <option value="Sintetizadores">Sintetizadores</option>
+                            <option value="Tablatura">Tablatura</option>
+                            <option value="Teoría">Teoría General</option>
+                        </select>
+                        <textarea name="estudio-desc" placeholder="Descripción general..." rows="2" style="padding: 8px; background: var(--bg-input); color: #fff;"></textarea>
+                        <button type="submit" class="btn-primary">Guardar e Iniciar Estudio</button>
+                    </form>
+                </div>
+                {% endif %}
+
+                <div style="display: flex; flex-direction: column; gap: 15px;">
+                    {% for e in estudios %}
+                        {% if (subtab_estudios == 'busqueda_estudios') or (subtab_estudios == 'comunidad') or (subtab_estudios == 'favoritos' and e.es_favorito) or (subtab_estudios == 'mis_estudios' and e.es_mio) %}
+                        <div class="study-card" style="background: var(--bg-card); padding: 15px; border: 1px solid var(--border-color); border-radius: var(--radius-md);">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <strong style="font-size: 1.1rem; color: var(--neon-cyan);">
+                                        <a href="{{ url_for('ver_estudio', estudio_id=e.id) }}" style="color: inherit; text-decoration: none;">{{ e.titulo }}</a>
+                                    </strong>
+                                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 2px;">
+                                        Por <a href="{{ url_for('ver_perfil_usuario', handle=e.handle) }}" style="color: inherit;">@{{ e.handle }}</a> • {{ e.capitulos|length }} Capítulos
+                                    </p>
+                                </div>
+                                <div style="display: flex; gap: 10px; align-items: center;">
+                                    <span class="badge" style="background: var(--neon-purple); color: #fff; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 0.8rem;">{{ e.categoria }}</span>
+                                    <form action="{{ url_for('toggle_favorito_estudio', estudio_id=e.id, subtab=subtab_estudios) }}" method="POST">
+                                        <button type="submit" style="background: transparent; border: none; cursor: pointer;">
+                                            <i class="{{ 'fa-solid' if e.es_favorito else 'fa-regular' }} fa-star" style="color: #ffd166; font-size: 1.2rem;"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            <p style="font-size: 0.9rem; margin-top: 8px;">{{ e.descripcion }}</p>
+
+                            <div style="margin-top: 12px; display: flex; gap: 10px; align-items: center;">
+                                <form action="{{ url_for('like_estudio', estudio_id=e.id, redirect_to=subtab_estudios) }}" method="POST">
+                                    <button type="submit" class="btn-small" style="background: transparent; border: 1px solid var(--border-color);">
+                                        <i class="{{ 'fa-solid' if e.liked_by_me else 'fa-regular' }} fa-heart" style="{{ 'color: #ff4a4a;' if e.liked_by_me }}"></i> {{ e.likes }}
+                                    </button>
+                                </form>
+                                <a href="{{ url_for('ver_estudio', estudio_id=e.id) }}" class="btn-small" style="text-decoration: none; border: 1px solid var(--border-color);">
+                                    <i class="fa-regular fa-comment"></i> {{ e.comentarios|length }} Comentarios
+                                </a>
+                                <a href="{{ url_for('ver_estudio', estudio_id=e.id) }}" class="btn-small" style="text-decoration: none; border: 1px solid var(--border-color);">
+                                    <i class="fa-regular fa-book-open"></i> Ver Lección
+                                </a>
+                            </div>
+                        </div>
+                        {% endif %}
+                    {% else %}
+                    <p style="color: var(--text-muted);">No se encontraron estudios.</p>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- 4. DETALLE DE ESTUDIO -->
+            {% if tab_activa == 'detalle_estudio' and estudio_detalle %}
+            <div id="tab-detalle-estudio" class="tab-content active-tab">
+                <a href="{{ url_for('home', tab='estudios') }}" class="btn-small" style="margin-bottom: 15px; display: inline-block;"><i class="fa-solid fa-arrow-left"></i> Volver a Estudios</a>
+                
+                <div style="background: var(--bg-card); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--neon-cyan);">
+                    <div style="display: flex; justify-content: space-between;">
+                        <h2>{{ estudio_detalle.titulo }}</h2>
+                        <span class="badge" style="background: var(--neon-purple); color: #fff; padding: 4px 8px; border-radius: 4px; height: fit-content;">{{ estudio_detalle.categoria }}</span>
+                    </div>
+                    <p style="color: var(--text-muted); margin-top: 5px;">
+                        Creado por <a href="{{ url_for('ver_perfil_usuario', handle=estudio_detalle.handle) }}" style="color: var(--neon-cyan);">@{{ estudio_detalle.handle }}</a>
+                    </p>
+                    <p style="margin-top: 10px;">{{ estudio_detalle.descripcion }}</p>
+
+                    <div style="margin-top: 15px;">
+                        <form action="{{ url_for('like_estudio', estudio_id=estudio_detalle.id, redirect_to='detalle') }}" method="POST">
+                            <button type="submit" class="btn-small">
+                                <i class="{{ 'fa-solid' if estudio_detalle.liked_by_me else 'fa-regular' }} fa-heart" style="{{ 'color: #ff4a4a;' if estudio_detalle.liked_by_me }}"></i> {{ estudio_detalle.likes }} Me gusta
+                            </button>
+                        </form>
+                    </div>
+
+                    {% if estudio_detalle.es_mio %}
+                    <div style="margin-top: 20px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px;">
+                        <h4>+ Añadir Capítulo</h4>
+                        <form action="{{ url_for('agregar_capitulo', estudio_id=estudio_detalle.id) }}" method="POST" style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px;">
+                            <input type="text" name="capitulo-titulo" placeholder="Título del capítulo..." required style="padding: 6px;">
+                            <textarea name="capitulo-explicacion" placeholder="Explicación detallada..." rows="2" style="padding: 6px; background: var(--bg-input); color:#fff;"></textarea>
+                            <input type="url" name="capitulo-url" placeholder="URL de YouTube (Opcional)..." style="padding: 6px;">
+                            <button type="submit" class="btn-primary" style="width: fit-content;">Guardar Capítulo</button>
+                        </form>
+                    </div>
+                    {% endif %}
+
+                    <h3 style="margin-top: 25px; color: var(--neon-cyan);">Capítulos</h3>
+                    {% for cap in estudio_detalle.capitulos %}
+                    <div style="margin-top: 15px; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 8px; border-left: 3px solid var(--neon-cyan);">
+                        <h4>Capítulo {{ cap.numero }}: {{ cap.titulo }}</h4>
+                        <p style="margin-top: 5px;">{{ cap.explicacion }}</p>
+                        {% if cap.media_url %}
+                        <iframe width="100%" height="250" src="{{ cap.media_url }}" frameborder="0" allowfullscreen style="margin-top: 10px;"></iframe>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+
+                    <div style="margin-top: 30px; border-top: 1px solid var(--border-color); padding-top: 20px;">
+                        <h3>Comentarios ({{ estudio_detalle.comentarios|length }})</h3>
+                        
+                        <form action="{{ url_for('comentar_estudio', estudio_id=estudio_detalle.id, redirect_to='detalle') }}" method="POST" style="display: flex; gap: 10px; margin: 15px 0;">
+                            <input type="text" name="comentario" placeholder="Escribe un comentario sobre esta lección..." required style="flex: 1; padding: 10px; background: var(--bg-input); border: 1px solid var(--border-color); color: #fff;">
+                            <button type="submit" class="btn-primary">Comentar</button>
+                        </form>
+
+                        {% for c in estudio_detalle.comentarios %}
+                        <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; margin-bottom: 12px; border-left: 3px solid var(--neon-cyan);">
+                            <div style="display: flex; justify-content: space-between;">
+                                <a href="{{ url_for('ver_perfil_usuario', handle=c.handle) }}" style="color: inherit; text-decoration: none;">
+                                    <strong>{{ c.autor }}</strong> <small style="color: var(--text-muted);">@{{ c.handle }} • {{ c.fecha }}</small>
+                                </a>
+                                <form action="{{ url_for('like_comentario_estudio', estudio_id=estudio_detalle.id, comentario_id=c.id, redirect_to='detalle') }}" method="POST">
+                                    <button type="submit" style="background: transparent; border: none; color: #fff; cursor: pointer;">
+                                        <i class="{{ 'fa-solid' if c.liked_by_me else 'fa-regular' }} fa-heart" style="{{ 'color: #ff4a4a;' if c.liked_by_me }}"></i> {{ c.likes }}
+                                    </button>
+                                </form>
+                            </div>
+                            <p style="margin: 8px 0;">{{ c.texto }}</p>
+
+                            <div style="margin-left: 20px; border-left: 2px solid var(--border-color); padding-left: 10px; margin-top: 8px;">
+                                {% for r in c.respuestas %}
+                                <div style="font-size: 0.85rem; margin-top: 5px;">
+                                    <!-- PERFIL DEL QUE RESPONDIÓ EL COMENTARIO EN ESTUDIOS -->
+                                    <a href="{{ url_for('ver_perfil_usuario', handle=r.handle) }}" style="color: var(--neon-cyan); text-decoration: none; font-weight: bold;">{{ r.autor }} (@{{ r.handle }}):</a>
+                                    <span>{{ r.texto }}</span>
+                                    <small style="color: var(--text-muted);">({{ r.fecha }})</small>
+                                </div>
+                                {% endfor %}
+
+                                <form action="{{ url_for('responder_comentario_estudio', estudio_id=estudio_detalle.id, comentario_id=c.id, redirect_to='detalle') }}" method="POST" style="display: flex; gap: 5px; margin-top: 8px;">
+                                    <input type="text" name="respuesta" placeholder="Responder..." required style="flex: 1; padding: 5px; font-size: 0.8rem; background: var(--bg-input); border: 1px solid var(--border-color); color: #fff;">
+                                    <button type="submit" class="btn-small" style="padding: 4px 8px; font-size: 0.8rem;">Responder</button>
+                                </form>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- 5. BÓVEDA / MI PERFIL CON BUSCADOR Y LIKES -->
+            {% if tab_activa == 'boveda' and perfil %}
+            <div id="tab-boveda" class="tab-content active-tab">
+                
+                <!-- BUSCADOR DE USUARIOS (POR ENCIMA DEL BANNER) -->
+                <form action="{{ url_for('home') }}" method="GET" style="display: flex; gap: 8px; margin-bottom: 15px;">
+                    <input type="hidden" name="tab" value="boveda">
+                    <input type="text" name="q_usuarios" value="{{ q_usuarios }}" placeholder="🔍 Buscar usuarios específicos por nombre o @handle..." style="flex: 1; padding: 10px; background: var(--bg-input); color: #fff; border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
+                    <button type="submit" class="btn-primary" style="padding: 10px 15px;">Buscar Usuario</button>
+                    {% if q_usuarios %}
+                    <a href="{{ url_for('home', tab='boveda') }}" class="btn-small" style="text-decoration: none; display: flex; align-items: center; border: 1px solid #ff4a4a; color: #ff4a4a;">Limpiar</a>
+                    {% endif %}
+                </form>
+
+                {% if q_usuarios %}
+                <div style="background: var(--bg-card); padding: 15px; border-radius: var(--radius-md); margin-bottom: 20px; border: 1px solid var(--neon-cyan);">
+                    <h3>Resultados de Usuarios para "{{ q_usuarios }}"</h3>
+                    <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+                        {% for h, u in usuarios_filtrados.items() %}
+                        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 6px;">
+                            <div>
+                                <a href="{{ url_for('ver_perfil_usuario', handle=u.handle) }}" style="color: var(--neon-cyan); text-decoration: none; font-weight: bold;">{{ u.nombre }}</a>
+                                <small style="color: var(--text-muted);"> @{{ u.handle }}</small>
+                                <p style="font-size: 0.85rem; margin-top: 2px;">{{ u.bio }}</p>
+                            </div>
+                            <a href="{{ url_for('ver_perfil_usuario', handle=u.handle) }}" class="btn-small" style="text-decoration: none;">Ver Perfil</a>
+                        </div>
+                        {% else %}
+                        <p style="color: var(--text-muted);">No se encontraron usuarios con ese nombre.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="profile-card" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 20px;">
+                    <div class="profile-banner" style="height: 140px; background: linear-gradient(135deg, #7b2cbf, #00f5d4); position: relative;">
+                        {% if perfil.banner_url %}<img src="{{ perfil.banner_url }}" style="width:100%; height:100%; object-fit:cover;">{% endif %}
+                    </div>
+                    <div style="padding: 20px; position: relative;">
+                        <div class="profile-avatar" style="width: 80px; height: 80px; border-radius: 50%; background: #222; border: 3px solid var(--bg-card); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.5rem; color: var(--neon-cyan); position: absolute; top: -40px; overflow: hidden;">
+                            {% if perfil.foto_avatar %}<img src="{{ perfil.foto_avatar }}" style="width:100%; height:100%; object-fit:cover;">{% else %}DEV{% endif %}
+                        </div>
+                        <div style="display: flex; justify-content: flex-end;">
+                            <a href="{{ url_for('home', tab='ajustes') }}" class="btn-small" style="text-decoration: none; padding: 8px 16px;"><i class="fa-solid fa-pen"></i> Configurar Perfil</a>
+                        </div>
+                        <div style="margin-top: 15px;">
+                            <h3 style="margin: 0;">{{ perfil.nombre }}</h3>
+                            <span style="color: var(--text-muted); font-size: 0.9rem;">@{{ perfil.handle }}</span>
+                            <p style="margin: 12px 0;">{{ perfil.bio }}</p>
+                            
+                            <div style="display: flex; gap: 20px; font-size: 0.9rem; color: var(--text-muted); cursor: pointer;">
+                                <span onclick="alert('Siguiendo a: {{ perfil.lista_siguiendo|join(', ') }}')"><strong style="color: #fff;">{{ perfil.siguiendo_count }}</strong> Siguiendo</span>
+                                <span onclick="alert('Seguidores: {{ perfil.lista_seguidores|join(', ') }}')"><strong style="color: #fff;">{{ perfil.seguidores_count }}</strong> Seguidores</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <a href="{{ url_for('home', tab='boveda', subtab_boveda='posts') }}" class="btn-small {{ 'btn-primary' if subtab_boveda == 'posts' else '' }}" style="text-decoration: none;">Mis Posts</a>
+                    <a href="{{ url_for('home', tab='boveda', subtab_boveda='estudios') }}" class="btn-small {{ 'btn-primary' if subtab_boveda == 'estudios' else '' }}" style="text-decoration: none;">Mis Estudios Creados</a>
+                    <a href="{{ url_for('home', tab='boveda', subtab_boveda='likes') }}" class="btn-small {{ 'btn-primary' if subtab_boveda == 'likes' else '' }}" style="text-decoration: none;"><i class="fa-solid fa-heart" style="color:#ff4a4a;"></i> Me Gusta</a>
+                </div>
+
+                {% if subtab_boveda == 'posts' %}
+                    {% for post in all_posts %}
+                        {% if post.handle == perfil.handle %}
+                        <article class="post-card" style="margin-bottom: 15px; background: var(--bg-card); padding: 15px; border-radius: var(--radius-md);">
+                            <h4><a href="{{ url_for('ver_post', post_id=post.id) }}" style="color: var(--neon-cyan); text-decoration: none;">{{ post.titulo }}</a></h4>
+                            <p>{{ post.descripcion }}</p>
+                        </article>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+
+                {% if subtab_boveda == 'estudios' %}
+                    {% for e in all_estudios %}
+                        {% if e.es_mio %}
+                        <div style="background: var(--bg-card); padding: 15px; border-radius: var(--radius-md); margin-bottom: 15px;">
+                            <h4><a href="{{ url_for('ver_estudio', estudio_id=e.id) }}" style="color: var(--neon-cyan); text-decoration: none;">{{ e.titulo }}</a></h4>
+                            <p>{{ e.descripcion }}</p>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+
+                <!-- SECCIÓN ME GUSTA PROPIA -->
+                {% if subtab_boveda == 'likes' %}
+                    <h4 style="color: var(--neon-cyan); margin-bottom: 10px;">Posts que te gustaron:</h4>
+                    {% for post in all_posts %}
+                        {% if post.liked_by_me %}
+                        <article class="post-card" style="margin-bottom: 12px; background: var(--bg-card); padding: 12px; border-radius: var(--radius-md); border-left: 3px solid #ff4a4a;">
+                            <h4><a href="{{ url_for('ver_post', post_id=post.id) }}" style="color: var(--neon-cyan); text-decoration: none;">{{ post.titulo }}</a></h4>
+                            <small style="color: var(--text-muted);">Por @{{ post.handle }}</small>
+                        </article>
+                        {% endif %}
+                    {% endfor %}
+
+                    <h4 style="color: var(--neon-cyan); margin: 20px 0 10px 0;">Estudios que te gustaron:</h4>
+                    {% for e in all_estudios %}
+                        {% if e.liked_by_me %}
+                        <div style="background: var(--bg-card); padding: 12px; border-radius: var(--radius-md); margin-bottom: 12px; border-left: 3px solid #ff4a4a;">
+                            <h4><a href="{{ url_for('ver_estudio', estudio_id=e.id) }}" style="color: var(--neon-cyan); text-decoration: none;">{{ e.titulo }}</a></h4>
+                            <small style="color: var(--text-muted);">Por @{{ e.handle }}</small>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- 6. PERFIL DE OTRO USUARIO CON BUSCADOR Y LIKES -->
+            {% if tab_activa == 'perfil_visitado' and perfil_visitado %}
+            <div id="tab-perfil-visitado" class="tab-content active-tab">
+                
+                <!-- BUSCADOR DE USUARIOS EN PERFIL AJENO -->
+                <form action="{{ url_for('ver_perfil_usuario', handle=perfil_visitado.handle) }}" method="GET" style="display: flex; gap: 8px; margin-bottom: 15px;">
+                    <input type="text" name="q_usuarios" value="{{ q_usuarios }}" placeholder="🔍 Buscar otros usuarios..." style="flex: 1; padding: 10px; background: var(--bg-input); color: #fff; border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
+                    <button type="submit" class="btn-primary" style="padding: 10px 15px;">Buscar</button>
+                    {% if q_usuarios %}
+                    <a href="{{ url_for('ver_perfil_usuario', handle=perfil_visitado.handle) }}" class="btn-small" style="text-decoration: none; display: flex; align-items: center; border: 1px solid #ff4a4a; color: #ff4a4a;">Limpiar</a>
+                    {% endif %}
+                </form>
+
+                {% if q_usuarios %}
+                <div style="background: var(--bg-card); padding: 15px; border-radius: var(--radius-md); margin-bottom: 20px; border: 1px solid var(--neon-cyan);">
+                    <h3>Resultados de Usuarios para "{{ q_usuarios }}"</h3>
+                    <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+                        {% for h, u in usuarios_filtrados.items() %}
+                        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 6px;">
+                            <div>
+                                <a href="{{ url_for('ver_perfil_usuario', handle=u.handle) }}" style="color: var(--neon-cyan); text-decoration: none; font-weight: bold;">{{ u.nombre }}</a>
+                                <small style="color: var(--text-muted);"> @{{ u.handle }}</small>
+                            </div>
+                            <a href="{{ url_for('ver_perfil_usuario', handle=u.handle) }}" class="btn-small" style="text-decoration: none;">Ver Perfil</a>
+                        </div>
+                        {% else %}
+                        <p style="color: var(--text-muted);">No se encontraron usuarios.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <a href="{{ url_for('home', tab='feed') }}" class="btn-small" style="margin-bottom: 15px; display: inline-block;"><i class="fa-solid fa-arrow-left"></i> Volver</a>
+                
+                <div class="profile-card" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 20px;">
+                    <div class="profile-banner" style="height: 140px; background: linear-gradient(135deg, #00f5d4, #7b2cbf);"></div>
+                    <div style="padding: 20px; position: relative;">
+                        <div class="profile-avatar" style="width: 80px; height: 80px; border-radius: 50%; background: #222; border: 3px solid var(--bg-card); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.5rem; color: var(--neon-cyan); position: absolute; top: -40px;">
+                            {{ perfil_visitado.nombre[0] }}
+                        </div>
+                        <div style="display: flex; justify-content: flex-end;">
+                            <form action="{{ url_for('toggle_seguir', handle=perfil_visitado.handle) }}" method="POST">
+                                <button type="submit" class="btn-primary" style="{{ 'background: transparent; border: 1px solid #ff4a4a; color: #ff4a4a;' if perfil_visitado.siguiendo_por_mi else '' }}">
+                                    {{ 'Siguiendo (Dejar de seguir)' if perfil_visitado.siguiendo_por_mi else '+ Seguir' }}
+                                </button>
+                            </form>
+                        </div>
+                        <div style="margin-top: 15px;">
+                            <h3 style="margin: 0;">{{ perfil_visitado.nombre }}</h3>
+                            <span style="color: var(--text-muted); font-size: 0.9rem;">@{{ perfil_visitado.handle }}</span>
+                            <p style="margin: 12px 0;">{{ perfil_visitado.bio }}</p>
+                            <div style="display: flex; gap: 20px; font-size: 0.9rem; color: var(--text-muted);">
+                                <span><strong style="color: #fff;">{{ perfil_visitado.siguiendo_count }}</strong> Siguiendo</span>
+                                <span><strong style="color: #fff;">{{ perfil_visitado.seguidores_count }}</strong> Seguidores</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUB-PESTAÑAS EN PERFIL DE TERCEROS -->
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <a href="{{ url_for('ver_perfil_usuario', handle=perfil_visitado.handle, subtab_visitado='posts') }}" class="btn-small {{ 'btn-primary' if subtab_perfil_visitado == 'posts' else '' }}" style="text-decoration: none;">Posts de {{ perfil_visitado.nombre }}</a>
+                    <a href="{{ url_for('ver_perfil_usuario', handle=perfil_visitado.handle, subtab_visitado='estudios') }}" class="btn-small {{ 'btn-primary' if subtab_perfil_visitado == 'estudios' else '' }}" style="text-decoration: none;">Estudios de {{ perfil_visitado.nombre }}</a>
+                    <a href="{{ url_for('ver_perfil_usuario', handle=perfil_visitado.handle, subtab_visitado='likes') }}" class="btn-small {{ 'btn-primary' if subtab_perfil_visitado == 'likes' else '' }}" style="text-decoration: none;"><i class="fa-solid fa-heart" style="color:#ff4a4a;"></i> Le Gusta</a>
+                </div>
+
+                {% if subtab_perfil_visitado == 'posts' %}
+                    {% for post in user_posts %}
+                    <article class="post-card" style="margin-top: 10px; background: var(--bg-card); padding: 15px; border-radius: var(--radius-md);">
+                        <h4><a href="{{ url_for('ver_post', post_id=post.id) }}" style="color: var(--neon-cyan); text-decoration: none;">{{ post.titulo }}</a></h4>
+                        <p>{{ post.descripcion }}</p>
+                    </article>
+                    {% else %}
+                    <p style="color: var(--text-muted);">Este usuario aún no tiene publicaciones.</p>
+                    {% endfor %}
+                {% endif %}
+
+                {% if subtab_perfil_visitado == 'estudios' %}
+                    {% for e in user_estudios %}
+                    <div style="background: var(--bg-card); padding: 15px; border-radius: var(--radius-md); margin-top: 10px;">
+                        <h4><a href="{{ url_for('ver_estudio', estudio_id=e.id) }}" style="color: var(--neon-cyan); text-decoration: none;">{{ e.titulo }}</a></h4>
+                        <p>{{ e.descripcion }}</p>
+                    </div>
+                    {% else %}
+                    <p style="color: var(--text-muted);">Este usuario aún no ha publicado estudios.</p>
+                    {% endfor %}
+                {% endif %}
+
+                <!-- SECCIÓN LE GUSTA DE TERCEROS -->
+                {% if subtab_perfil_visitado == 'likes' %}
+                    <h4 style="color: var(--neon-cyan); margin-bottom: 10px;">Posts que le han gustado a {{ perfil_visitado.nombre }}:</h4>
+                    {% for post in user_liked_posts %}
+                    <article class="post-card" style="margin-bottom: 12px; background: var(--bg-card); padding: 12px; border-radius: var(--radius-md); border-left: 3px solid #ff4a4a;">
+                        <h4><a href="{{ url_for('ver_post', post_id=post.id) }}" style="color: var(--neon-cyan); text-decoration: none;">{{ post.titulo }}</a></h4>
+                        <small style="color: var(--text-muted);">Por @{{ post.handle }}</small>
+                    </article>
+                    {% else %}
+                    <p style="color: var(--text-muted);">Aún no hay posts marcados con me gusta.</p>
+                    {% endfor %}
+
+                    <h4 style="color: var(--neon-cyan); margin: 20px 0 10px 0;">Estudios que le han gustado a {{ perfil_visitado.nombre }}:</h4>
+                    {% for e in user_liked_estudios %}
+                    <div style="background: var(--bg-card); padding: 12px; border-radius: var(--radius-md); margin-bottom: 12px; border-left: 3px solid #ff4a4a;">
+                        <h4><a href="{{ url_for('ver_estudio', estudio_id=e.id) }}" style="color: var(--neon-cyan); text-decoration: none;">{{ e.titulo }}</a></h4>
+                        <small style="color: var(--text-muted);">Por @{{ e.handle }}</small>
+                    </div>
+                    {% else %}
+                    <p style="color: var(--text-muted);">Aún no hay estudios marcados con me gusta.</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- 7. PESTAÑA: AJUSTES -->
+            {% if tab_activa == 'ajustes' and perfil %}
+            <div id="tab-ajustes" class="tab-content active-tab">
+                <section class="section-block">
+                    <h2><i class="fa-solid fa-gear"></i> Configuración de Cuenta y Ajustes</h2>
+                    <form class="settings-form" action="{{ url_for('actualizar_ajustes') }}" method="POST" style="display: flex; flex-direction: column; gap: 15px; margin-top: 15px;">
+                        <div>
+                            <label>Alias (Nombre Público):</label>
+                            <input type="text" name="alias" value="{{ perfil.nombre }}" style="width: 100%; padding: 10px; margin-top: 5px;">
+                            <small style="color: var(--text-muted);">Solo se puede cambiar una vez cada 7 días.</small>
+                        </div>
+                        <div>
+                            <label>Nombre de Usuario (@):</label>
+                            <input type="text" name="handle" value="{{ perfil.handle }}" style="width: 100%; padding: 10px; margin-top: 5px;">
+                            <small style="color: var(--text-muted);">Solo se puede cambiar una vez cada 30 días.</small>
+                        </div>
+                        <div>
+                            <label>Correo Electrónico:</label>
+                            <input type="email" name="email" value="{{ perfil.email }}" style="width: 100%; padding: 10px; margin-top: 5px;">
+                        </div>
+                        <div>
+                            <label>Cambiar Contraseña:</label>
+                            <input type="password" name="password" placeholder="••••••••••••" style="width: 100%; padding: 10px; margin-top: 5px;">
+                        </div>
+                        <div>
+                            <label>Biografía:</label>
+                            <textarea name="bio" rows="2" style="width: 100%; padding: 10px; margin-top: 5px; background: var(--bg-input); color: #fff;">{{ perfil.bio }}</textarea>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <div style="flex: 1;">
+                                <label>Foto de Perfil (URL):</label>
+                                <input type="text" name="foto_url" value="{{ perfil.foto_avatar }}" style="width: 100%; padding: 10px; margin-top: 5px;">
+                            </div>
+                            <div style="flex: 1;">
+                                <label>Banner de Perfil (URL):</label>
+                                <input type="text" name="banner_url" value="{{ perfil.banner_url }}" style="width: 100%; padding: 10px; margin-top: 5px;">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label>Aspecto del Tema:</label>
+                            <select name="tema" id="theme-selector" style="width: 100%; padding: 10px; margin-top: 5px;">
+                                <option value="oscuro" {% if perfil.tema == 'oscuro' %}selected{% endif %}>Oscuro</option>
+                                <option value="claro" {% if perfil.tema == 'claro' %}selected{% endif %}>Claro</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn-primary">Guardar Cambios</button>
+
+                        <hr style="border-color: var(--border-color); margin: 15px 0;">
+
+                        <h4 style="color: var(--neon-cyan); margin-bottom: 10px;"><i class="fa-solid fa-circle-info"></i> Ayuda & Comunidad</h4>
+                        
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <a href="{{ url_for('politicas') }}" class="btn-small" style="text-decoration: none; padding: 10px;">
+                                <i class="fa-solid fa-shield-halved"></i> Políticas de Privacidad
+                            </a>
+                            <a href="{{ url_for('terminos') }}" class="btn-small" style="text-decoration: none; padding: 10px;">
+                                <i class="fa-solid fa-file-contract"></i> Términos de Uso
+                            </a>
+                            <a href="https://discord.gg/geV3dCnhvg" target="_blank" class="btn-small" style="text-decoration: none; padding: 10px; border-color: #5865F2; color: #5865F2;">
+                                <i class="fa-brands fa-discord"></i> Servidor de Discord (Reportar Bugs / Comunidad)
+                            </a>
+                        </div>
+
+                        <hr style="border-color: var(--border-color); margin: 15px 0;">
+
+                        <a href="{{ url_for('logout') }}" class="btn-primary" style="background: #ff4a4a; border: none; text-align: center; text-decoration: none; width: fit-content;">
+                            <i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión
+                        </a>
+                    </form>
+                </section>
+            </div>
+            {% endif %}
+
+            <!-- 8. POLITICAS DE PRIVACIDAD -->
+            {% if tab_activa == 'politicas' %}
+            <div class="tab-content active-tab" style="background: var(--bg-card); padding: 25px; border-radius: var(--radius-md); border: 1px solid var(--border-color); line-height: 1.6;">
+                <a href="{{ url_for('home', tab='ajustes') if perfil else url_for('home') }}" class="btn-small" style="text-decoration: none; display: inline-block; margin-bottom: 15px;"><i class="fa-solid fa-arrow-left"></i> Volver</a>
+                <h2 style="color: var(--neon-cyan); margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                    <i class="fa-solid fa-shield-halved"></i> Política de Privacidad de Otox
+                </h2>
+
+                <h4 style="color: var(--neon-purple); margin-top: 15px;">1. Cero Espionaje (Tu data es tuya)</h4>
+                <p style="margin-top: 5px;">En <strong>Otox</strong> no recolectamos, vendemos, comerciamos ni enviamos tu información personal a ningún tercero. Nos importa un carajo traficar con tus datos. La plataforma funciona con lo mínimo indispensable para que podás compartir tus temas, lecciones y navegar relajado.</p>
+
+                <h4 style="color: var(--neon-purple); margin-top: 20px;">2. Investigación de Cuentas por Reportes o Sospechas</h4>
+                <p style="margin-top: 5px;">Aunque no recopilamos datos de rastreo ni comercializamos nada, <strong>la paz de la comunidad no se negocia</strong>. Si se detectan actividades sospechosas, comportamientos abusivos o si recibimos reportes (ya sea dentro de la misma plataforma o vía canales oficiales como Discord):</p>
+                <ul style="margin-left: 20px; margin-top: 8px;">
+                    <li>Nos reservamos el derecho absoluto de auditar e investigar la cuenta implicada.</li>
+                    <li>Se revisará el historial de publicaciones, interacciones y registros internos asociados a esa cuenta para verificar el cumplimiento de las normas.</li>
+                    <li>Si la investigación confirma conductas maliciosas, la cuenta será suspendida o vetada de manera definitiva sin previo aviso.</li>
+                </ul>
+
+                <h4 style="color: var(--neon-purple); margin-top: 20px;">3. Integraciones de Terceros (YouTube / Spotify)</h4>
+                <p style="margin-top: 5px;">Al reproducir contenido embebido (iFrames de YouTube o Spotify), dichas plataformas se rigen por sus propias políticas de privacidad independientes. <strong>Otox</strong> no controla ni almacena la data que esos servicios recopilen mediante sus reproductores.</p>
+            </div>
+            {% endif %}
+
+            <!-- 9. TERMINOS Y CONDICIONES -->
+            {% if tab_activa == 'terminos' %}
+            <div class="tab-content active-tab" style="background: var(--bg-card); padding: 25px; border-radius: var(--radius-md); border: 1px solid var(--border-color); line-height: 1.6;">
+                <a href="{{ url_for('home', tab='ajustes') if perfil else url_for('home') }}" class="btn-small" style="text-decoration: none; display: inline-block; margin-bottom: 15px;"><i class="fa-solid fa-arrow-left"></i> Volver</a>
+                <h2 style="color: var(--neon-cyan); margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                    <i class="fa-solid fa-file-contract"></i> Términos de Uso de Otox
+                </h2>
+
+                <h4 style="color: var(--neon-purple); margin-top: 15px;">1. Aceptación de los Términos</h4>
+                <p style="margin-top: 5px;">Al ingresar, registrarte o interactuar en <strong>Otox</strong>, aceptás estas reglas sin pataleos. Si no estás de acuerdo, podés ir ahuecando el ala.</p>
+
+                <h4 style="color: var(--neon-purple); margin-top: 20px;">2. Uso de la Plataforma y Contenido</h4>
+                <ul style="margin-left: 20px; margin-top: 8px;">
+                    <li>Podés compartir enlaces de canciones, tutoriales y material educativo musical.</li>
+                    <li>Queda strictly prohibido el uso de la plataforma para spam, acoso, distribución de malware, contenido ilícito o cualquier intento de vulnerar la seguridad del sistema.</li>
+                    <li>Todo contenido que viole los derechos de autor o las normas de convivencia será eliminado sin asco.</li>
+                </ul>
+
+                <h4 style="color: var(--neon-purple); margin-top: 20px;">3. Reportes, Auditoría y Modificación de Cuentas</h4>
+                <p style="margin-top: 5px;">Cualquier usuario o canal comunitario (ej. servidor de Discord) puede reportar irregularidades. La administración de <strong>Otox</strong> tiene plena facultad para investigar cualquier perfil bajo sospecha, aplicar sanciones, congelar o eliminar cuentas que atenten contra la seguridad y estabilidad de la plataforma.</p>
+
+                <h4 style="color: var(--neon-purple); margin-top: 20px;">4. Limitación de Responsabilidad</h4>
+                <p style="margin-top: 5px;"><strong>Otox</strong> se proporciona "tal cual". No nos hacemos responsables por fallos temporales en los servicios de terceros (iFrames, APIs externas) ni por el mal uso que otros usuarios hagan del contenido publicado.</p>
+            </div>
+            {% endif %}
+
+        </main>
+
+        <!-- PANEL DE WIDGETS -->
+        <aside class="widgets-panel">
+            <section class="widget-card">
+                <div class="widget-header">
+                    <h3><i class="fa-solid fa-fire"></i> Estudios Destacados</h3>
+                </div>
+                <div class="studies-list" style="margin-top: 10px;">
+                    {% for e in all_estudios %}
+                    <a href="{{ url_for('ver_estudio', estudio_id=e.id) }}" style="text-decoration: none; color: inherit;">
+                        <div class="study-item" style="padding: 8px; border-bottom: 1px solid var(--border-color);">
+                            <strong>{{ e.titulo }}</strong><br>
+                            <small style="color: var(--text-muted);">Por @{{ e.handle }} • {{ e.capitulos|length }} Capítulos</small>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </section>
+        </aside>
+
+    </div>
+
+    <script>
+        function togglePostForm() {
+            const postCard = document.getElementById('create-post-card');
+            postCard.style.display = (postCard.style.display === 'none' || postCard.style.display === '') ? 'block' : 'none';
+        }
+
+        const themeSelect = document.getElementById('theme-selector');
+        if(themeSelect) {
+            themeSelect.addEventListener('change', (e) => {
+                const theme = e.target.value;
+                if (theme === 'claro') {
+                    document.documentElement.setAttribute('data-theme', 'light');
+                } else {
+                    document.documentElement.removeAttribute('data-theme');
+                }
+            });
+        }
+    </script>
+    {% endif %}
+</body>
+</html>
