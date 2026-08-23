@@ -210,7 +210,14 @@
                     <article class="post-card" style="margin-bottom: 20px; background: var(--bg-card); padding: 15px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
                         <div class="post-header" style="display: flex; gap: 10px; align-items: center;">
                             <a href="{{ url_for('ver_perfil_usuario', handle=post.handle) }}" style="text-decoration: none; color: inherit; display: flex; gap: 10px; align-items: center;">
-                                <div class="avatar-small" style="width: 35px; height: 35px; border-radius: 50%; background: var(--neon-cyan); color: #000; font-weight: bold; display: flex; align-items: center; justify-content: center;">DV</div>
+                                <!-- AVATAR DINÁMICO EN POST -->
+                                <div class="avatar-small" style="width: 35px; height: 35px; border-radius: 50%; background: var(--neon-cyan); color: #000; font-weight: bold; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                                    {% if post.foto_avatar %}
+                                        <img src="{{ post.foto_avatar }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                    {% else %}
+                                        {{ post.autor[0]|upper }}
+                                    {% endif %}
+                                </div>
                                 <div>
                                     <strong>{{ post.autor }}</strong> <small style="color: var(--text-muted);">@{{ post.handle }}</small>
                                     <span class="post-time">• {{ post.tiempo }}</span>
@@ -643,11 +650,20 @@
 
                 <a href="{{ url_for('home', tab='feed') }}" class="btn-small" style="margin-bottom: 15px; display: inline-block;"><i class="fa-solid fa-arrow-left"></i> Volver</a>
                 
+                <!-- BANNER Y AVATAR DEL USUARIO VISITADO -->
                 <div class="profile-card" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 20px;">
-                    <div class="profile-banner" style="height: 140px; background: linear-gradient(135deg, #00f5d4, #7b2cbf);"></div>
+                    <div class="profile-banner" style="height: 140px; background: linear-gradient(135deg, #00f5d4, #7b2cbf); position: relative; overflow: hidden;">
+                        {% if perfil_visitado.banner_url %}
+                            <img src="{{ perfil_visitado.banner_url }}" style="width: 100%; height: 100%; object-fit: cover;">
+                        {% endif %}
+                    </div>
                     <div style="padding: 20px; position: relative;">
-                        <div class="profile-avatar" style="width: 80px; height: 80px; border-radius: 50%; background: #222; border: 3px solid var(--bg-card); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.5rem; color: var(--neon-cyan); position: absolute; top: -40px;">
-                            {{ perfil_visitado.nombre[0] }}
+                        <div class="profile-avatar" style="width: 80px; height: 80px; border-radius: 50%; background: #222; border: 3px solid var(--bg-card); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.5rem; color: var(--neon-cyan); position: absolute; top: -40px; overflow: hidden;">
+                            {% if perfil_visitado.foto_avatar %}
+                                <img src="{{ perfil_visitado.foto_avatar }}" style="width: 100%; height: 100%; object-fit: cover;">
+                            {% else %}
+                                {{ perfil_visitado.nombre[0]|upper }}
+                            {% endif %}
                         </div>
                         <div style="display: flex; justify-content: flex-end;">
                             <form action="{{ url_for('toggle_seguir', handle=perfil_visitado.handle) }}" method="POST">
