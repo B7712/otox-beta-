@@ -941,26 +941,35 @@ def actualizar_ajustes():
         return redirect(url_for('home'))
 
     mi_id = perfil_usuario['id']
-    
-    nombre = request.form.get('alias', perfil_usuario['nombre'])
-    handle = request.form.get('handle', perfil_usuario['handle'])
-    email = request.form.get('email', perfil_usuario['email'])
-    nueva_pass = request.form.get('password') or perfil_usuario['password']
-    bio = request.form.get('bio', perfil_usuario['bio'])
-    foto_avatar = request.form.get('foto_url', perfil_usuario['foto_avatar'])
-    banner_url = request.form.get('banner_url', perfil_usuario['banner_url'])
-    tema = request.form.get('tema', perfil_usuario['tema'])
-    
+    nombre = request.form.get('alias', '').strip()
+    handle = request.form.get('handle', '').strip().replace('@', '').lower()
+    email = request.form.get('email', '').strip().lower()
+    password = request.form.get('password', '').strip()
+    bio = request.form.get('bio', '').strip()
+    foto_url = request.form.get('foto_url', '').strip()
+    banner_url = request.form.get('banner_url', '').strip()
+    tema = request.form.get('tema', 'oscuro')
+
     conn = database.obtener_conexion()
     cursor = conn.cursor()
-    cursor.execute("""
-        UPDATE usuarios 
-        SET nombre = ?, handle = ?, email = ?, password = ?, bio = ?, foto_avatar = ?, banner_url = ?, tema = ?
-        WHERE id = ?
-    """, (nombre, handle, email, nueva_pass, bio, foto_avatar, banner_url, tema, mi_id))
+
+    if password:
+        cursor.execute("""
+            UPDATE usuarios 
+            SET nombre = ?, handle = ?, email = ?, password = ?, bio = ?, foto_avatar = ?, banner_url = ?, tema = ?
+            WHERE id = ?
+        """, (nombre, handle, email, password, bio, foto_url, banner_url, tema, mi_id))
+    else:
+        cursor.execute("""
+            UPDATE usuarios 
+            SET nombre = ?, handle = ?, email = ?, bio = ?, foto_avatar = ?, banner_url = ?, tema = ?
+            WHERE id = ?
+        """, (nombre, handle, email, bio, foto_url, banner_url, tema, mi_id))
+
     conn.commit()
     conn.close()
-    
+
+    flash("Perfil actualizado correctamente.")
     return redirect(url_for('home', tab='ajustes'))
 
 if __name__ == '__main__':
