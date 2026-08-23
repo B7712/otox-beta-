@@ -1,11 +1,32 @@
+import os
 import sqlite3
+
+# Intentamos importar libsql para cuando estemos en producción (Turso)
+try:
+    import libsql_experimental as libsql
+    HAS_LIBSQL = True
+except ImportError:
+    HAS_LIBSQL = False
 
 DATABASE_NAME = "otox.db"
 
 def obtener_conexion():
-    """Crea y retorna una conexión a la base de datos."""
-    conn = sqlite3.connect(DATABASE_NAME)
-    conn.row_factory = sqlite3.Row
+    """
+    Crea y retorna una conexión a la base de datos.
+    Usa Turso en Render si las variables existen, o SQLite local en PC/Termux.
+    """
+    turso_url = os.environ.get("TURSO_DATABASE_URL")
+    turso_token = os.environ.get("TURSO_AUTH_TOKEN")
+
+    # Si estamos en Render y tenemos las credenciales de Turso
+    if HAS_LIBSQL and turso_url and turso_token:
+        conn = libsql.connect(database=turso_url, auth_token=turso_token)
+        # Nota: libsql maneja sus propios tipos de fábrica de filas
+        return conn
+
+    # Conexión local tradicional con SQLite[cite: 1]
+    conn = sqlite3.connect(DATABASE_NAME)[cite: 1]
+    conn.row_factory = sqlite3.Row[cite: 1]
     return conn
 
 def inicializar_bd():
@@ -156,4 +177,4 @@ def inicializar_bd():
 
 if __name__ == '__main__':
     inicializar_bd()
-    print("¡Base de datos otox.db reinicializada y cargada con datos iniciales! 🚀")
+    print("¡Base de datos Otox reinicializada correctamente! 🚀")
